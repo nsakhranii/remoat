@@ -2,6 +2,7 @@ import * as net from 'net';
 import * as os from 'os';
 import { execFile, spawn } from 'child_process';
 import { CDP_PORTS } from '../../utils/cdpPorts';
+import { getAntigravityCliPath } from '../../utils/pathUtils';
 
 const APP_NAME = 'Antigravity';
 
@@ -70,7 +71,7 @@ function openMacOS(port: number): Promise<void> {
 }
 
 function openWindows(port: number): Promise<void> {
-    const executable = getCustomPath() ?? `${APP_NAME}.exe`;
+    const executable = getAntigravityCliPath();
     return new Promise((resolve, reject) => {
         try {
             const child = spawn(executable, [`--remote-debugging-port=${port}`], {

@@ -2,6 +2,7 @@ import { logger } from '../utils/logger';
 import { CDP_PORTS } from '../utils/cdpPorts';
 import { EventEmitter } from 'events';
 import * as http from 'http';
+import * as net from 'net';
 import { spawn } from 'child_process';
 import { getAntigravityCliPath, extractProjectNameFromPath } from '../utils/pathUtils';
 import WebSocket from 'ws';
@@ -557,20 +558,28 @@ export class CdpService extends EventEmitter {
         workspacePath: string,
         projectName: string,
     ): Promise<boolean> {
-        // Open as folder using Antigravity CLI (not as workspace mode).
-        // `open -a Antigravity` may open as workspace, resulting in title "Untitled (Workspace)".
-        // CLI --new-window opens as folder, immediately reflecting directory name in title.
+        // This method is only called when no CDP port is responding, meaning
+        // Antigravity is not running (or running without CDP). We must pass
+        // --remote-debugging-port so CDP is available for the poll loop below.
         const antigravityCli = getAntigravityCliPath();
+        const cdpPort = await this.findAvailableCdpPort();
+        if (cdpPort === null) {
+            throw new Error(
+                `No available CDP ports. All candidate ports are in use: ${this.ports.join(', ')}`,
+            );
+        }
 
-        logger.debug(`[CdpService] Launching Antigravity: ${antigravityCli} --new-window ${workspacePath}`);
+        const launchArgs = [`--remote-debugging-port=${cdpPort}`, '--new-window', workspacePath];
+        logger.debug(`[CdpService] Launching Antigravity: ${antigravityCli} ${launchArgs.join(' ')}`);
         try {
-            await this.runCommand(antigravityCli, ['--new-window', workspacePath]);
+            await this.runCommand(antigravityCli, launchArgs);
         } catch (error: any) {
-            // Fall back to open -a if CLI not found (macOS only)
-            logger.warn(`[CdpService] CLI launch failed, falling back to open -a (if macOS): ${error?.message || String(error)}`);
             if (process.platform === 'darwin') {
-                await this.runCommand('open', ['-a', 'Antigravity', workspacePath]);
+                // Fall back to open -a on macOS
+                logger.warn(`[CdpService] CLI launch failed, falling back to open -a: ${error?.message || String(error)}`);
+                await this.runCommand('open', ['-a', 'Antigravity', '--args', `--remote-debugging-port=${cdpPort}`, workspacePath]);
             } else {
+                logger.warn(`[CdpService] CLI launch failed: ${error?.message || String(error)}`);
                 throw error;
             }
         }
@@ -650,7 +659,10 @@ export class CdpService extends EventEmitter {
 
     private async runCommand(command: string, args: string[]): Promise<void> {
         await new Promise<void>((resolve, reject) => {
-            const child = spawn(command, args, { stdio: 'ignore' });
+            const child = spawn(command, args, {
+                stdio: 'ignore',
+                shell: process.platform === 'win32',
+            });
 
             child.once('error', (error) => {
                 reject(error);
@@ -664,6 +676,32 @@ export class CdpService extends EventEmitter {
                 reject(new Error(`${command} exited with code ${code ?? 'unknown'}`));
             });
         });
+    }
+
+    /**
+     * Check whether a TCP port is available (not in use).
+     */
+    private isPortAvailable(port: number): Promise<boolean> {
+        return new Promise((resolve) => {
+            const server = net.createServer();
+            server.once('error', () => resolve(false));
+            server.once('listening', () => {
+                server.close(() => resolve(true));
+            });
+            server.listen(port, '127.0.0.1');
+        });
+    }
+
+    /**
+     * Find the first available CDP port from the configured port list.
+     */
+    private async findAvailableCdpPort(): Promise<number | null> {
+        for (const port of this.ports) {
+            if (await this.isPortAvailable(port)) {
+                return port;
+            }
+        }
+        return null;
     }
 
     /**
